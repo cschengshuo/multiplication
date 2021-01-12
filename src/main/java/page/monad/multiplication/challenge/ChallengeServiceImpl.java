@@ -2,9 +2,12 @@ package page.monad.multiplication.challenge;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import page.monad.multiplication.serviceclients.GamificationServiceClient;
 import page.monad.multiplication.user.User;
 import page.monad.multiplication.user.UserRepository;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -15,6 +18,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private final UserRepository userRepository;
     private final ChallengeAttemptRepository attemptRepository;
+    private final GamificationServiceClient gameClient;
 
     @Override
     public ChallengeAttempt verifyAttempt(ChallengeAttemptDTO attemptDTO) {
@@ -43,6 +47,9 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         // Stores the attempt
         ChallengeAttempt storedAttempt = attemptRepository.save(checkedAttempt);
+
+        // Sends the attempt to gamification
+        gameClient.sendAttempt(storedAttempt);
 
         return storedAttempt;
     }

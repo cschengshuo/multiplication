@@ -1,12 +1,13 @@
 package page.monad.multiplication.challenge;
 
+import page.monad.multiplication.serviceclients.GamificationServiceClient;
+import page.monad.multiplication.user.User;
+import page.monad.multiplication.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import page.monad.multiplication.user.User;
-import page.monad.multiplication.user.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,16 +28,16 @@ public class ChallengeServiceTest {
     private UserRepository userRepository;
     @Mock
     private ChallengeAttemptRepository attemptRepository;
+    @Mock
+    private GamificationServiceClient gameClient;
 
     @BeforeEach
     public void setUp() {
         challengeService = new ChallengeServiceImpl(
                 userRepository,
-                attemptRepository
+                attemptRepository,
+                gameClient
         );
-        // Keep in mind that we needed to move the
-        // given(attemptRepository)... to the test cases
-        // that use it to prevent the unused stubs errors.
     }
 
     @Test
@@ -55,6 +56,7 @@ public class ChallengeServiceTest {
         then(resultAttempt.isCorrect()).isTrue();
         verify(userRepository).save(new User("john_doe"));
         verify(attemptRepository).save(resultAttempt);
+        verify(gameClient).sendAttempt(resultAttempt);
     }
 
     @Test
@@ -73,6 +75,7 @@ public class ChallengeServiceTest {
         then(resultAttempt.isCorrect()).isFalse();
         verify(userRepository).save(new User("john_doe"));
         verify(attemptRepository).save(resultAttempt);
+        verify(gameClient).sendAttempt(resultAttempt);
     }
 
     @Test
@@ -95,6 +98,7 @@ public class ChallengeServiceTest {
         then(resultAttempt.getUser()).isEqualTo(existingUser);
         verify(userRepository, never()).save(any());
         verify(attemptRepository).save(resultAttempt);
+        verify(gameClient).sendAttempt(resultAttempt);
     }
 
     @Test
