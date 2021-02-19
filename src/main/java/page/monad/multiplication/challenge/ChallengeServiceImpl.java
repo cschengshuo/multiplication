@@ -2,11 +2,9 @@ package page.monad.multiplication.challenge;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import page.monad.multiplication.serviceclients.GamificationServiceClient;
 import page.monad.multiplication.user.User;
 import page.monad.multiplication.user.UserRepository;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +16,10 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private final UserRepository userRepository;
     private final ChallengeAttemptRepository attemptRepository;
-    private final GamificationServiceClient gameClient;
+    private final ChallengeEventPub challengeEventPub;
 
     @Override
-    public ChallengeAttempt verifyAttempt(ChallengeAttemptDTO attemptDTO) {
+    public ChallengeAttempt verifyAttempt(ChallengeAttemptDto attemptDTO) {
         // Check if the user already exists for that alias, otherwise create it
         User user = userRepository.findByAlias(attemptDTO.getUserAlias())
                 .orElseGet(() -> {
@@ -48,8 +46,8 @@ public class ChallengeServiceImpl implements ChallengeService {
         // Stores the attempt
         ChallengeAttempt storedAttempt = attemptRepository.save(checkedAttempt);
 
-        // Sends the attempt to gamification
-        gameClient.sendAttempt(storedAttempt);
+        // 发表消息
+        challengeEventPub.challengeSolved(storedAttempt);
 
         return storedAttempt;
     }

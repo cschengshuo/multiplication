@@ -9,7 +9,7 @@ public interface ChallengeService {
      *
      * @return the resulting ChallengeAttempt object
      */
-    ChallengeAttempt verifyAttempt(ChallengeAttemptDTO attemptDTO);
+    ChallengeAttempt verifyAttempt(ChallengeAttemptDto attemptDTO);
 
     /**
      * Gets the statistics for a given user.

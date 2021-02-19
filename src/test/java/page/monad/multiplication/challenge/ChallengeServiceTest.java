@@ -1,6 +1,5 @@
 package page.monad.multiplication.challenge;
 
-import page.monad.multiplication.serviceclients.GamificationServiceClient;
 import page.monad.multiplication.user.User;
 import page.monad.multiplication.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,14 +28,14 @@ public class ChallengeServiceTest {
     @Mock
     private ChallengeAttemptRepository attemptRepository;
     @Mock
-    private GamificationServiceClient gameClient;
+    private ChallengeEventPub challengeEventPub;
 
     @BeforeEach
     public void setUp() {
         challengeService = new ChallengeServiceImpl(
                 userRepository,
                 attemptRepository,
-                gameClient
+                challengeEventPub
         );
     }
 
@@ -45,8 +44,8 @@ public class ChallengeServiceTest {
         // given
         given(attemptRepository.save(any()))
                 .will(returnsFirstArg());
-        ChallengeAttemptDTO attemptDTO =
-                new ChallengeAttemptDTO(50, 60, "john_doe", 3000);
+        ChallengeAttemptDto attemptDTO =
+                new ChallengeAttemptDto(50, 60, "john_doe", 3000);
 
         // when
         ChallengeAttempt resultAttempt =
@@ -56,7 +55,7 @@ public class ChallengeServiceTest {
         then(resultAttempt.isCorrect()).isTrue();
         verify(userRepository).save(new User("john_doe"));
         verify(attemptRepository).save(resultAttempt);
-        verify(gameClient).sendAttempt(resultAttempt);
+        verify(challengeEventPub).challengeSolved(resultAttempt);
     }
 
     @Test
@@ -64,8 +63,8 @@ public class ChallengeServiceTest {
         // given
         given(attemptRepository.save(any()))
                 .will(returnsFirstArg());
-        ChallengeAttemptDTO attemptDTO =
-                new ChallengeAttemptDTO(50, 60, "john_doe", 5000);
+        ChallengeAttemptDto attemptDTO =
+                new ChallengeAttemptDto(50, 60, "john_doe", 5000);
 
         // when
         ChallengeAttempt resultAttempt =
@@ -75,7 +74,7 @@ public class ChallengeServiceTest {
         then(resultAttempt.isCorrect()).isFalse();
         verify(userRepository).save(new User("john_doe"));
         verify(attemptRepository).save(resultAttempt);
-        verify(gameClient).sendAttempt(resultAttempt);
+        verify(challengeEventPub).challengeSolved(resultAttempt);
     }
 
     @Test
@@ -86,8 +85,8 @@ public class ChallengeServiceTest {
         User existingUser = new User(1L, "john_doe");
         given(userRepository.findByAlias("john_doe"))
                 .willReturn(Optional.of(existingUser));
-        ChallengeAttemptDTO attemptDTO =
-                new ChallengeAttemptDTO(50, 60, "john_doe", 5000);
+        ChallengeAttemptDto attemptDTO =
+                new ChallengeAttemptDto(50, 60, "john_doe", 5000);
 
         // when
         ChallengeAttempt resultAttempt =
@@ -98,7 +97,7 @@ public class ChallengeServiceTest {
         then(resultAttempt.getUser()).isEqualTo(existingUser);
         verify(userRepository, never()).save(any());
         verify(attemptRepository).save(resultAttempt);
-        verify(gameClient).sendAttempt(resultAttempt);
+        verify(challengeEventPub).challengeSolved(resultAttempt);
     }
 
     @Test

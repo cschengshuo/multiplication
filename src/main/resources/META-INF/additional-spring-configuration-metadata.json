@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "amqp.exchange.attempts",
+      "type": "java.lang.String",
+      "description": "Description for amqp.exchange.attempts."
+  }
+] }

@@ -5,10 +5,10 @@ import lombok.Value;
 import javax.validation.constraints.*;
 
 /**
- * Attempt coming from the user
+ * 用户解题尝试
  */
 @Value
-public class ChallengeAttemptDTO {
+public class ChallengeAttemptDto {
 
     @Min(1) @Max(99)
     int factorA, factorB;
